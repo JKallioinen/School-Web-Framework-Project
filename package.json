@@ -1,0 +1,33 @@
+{
+  "name": "school-web-framework-project",
+  "version": "1.0.0",
+  "description": "An Event Calendar & Event List Web App\r A web application for viewing, adding, and managing events using a calendar (with FullCalendar.js) and a list view. Built with Node.js, Express, FullCalendar.js, Handlebars, MongoDB, and Mongoose.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JKallioinen/School-Web-Framework-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JKallioinen/School-Web-Framework-Project/issues"
+  },
+  "homepage": "https://github.com/JKallioinen/School-Web-Framework-Project#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.14.1"
+  }
+}

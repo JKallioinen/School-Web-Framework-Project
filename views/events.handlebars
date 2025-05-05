@@ -1,0 +1,70 @@
+<main>
+  <!-- <div class="calendar">
+      <h1>Calendar</h1>
+      <iframe 
+        src="https://calendar.google.com/calendar/embed?height=600&wkst=2&ctz=Europe%2FHelsinki&showPrint=0&src=MzgxZDExYzA2ZDhlNzQ0Y2YwZjY1OWVlYWYyZWIzN2FjMDA2NWZkNTUyZjg1MjQwNDVkZjNhZjIwOGI0MTQ1OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23AD1457"
+        title="Google Calendar Embed"
+        loading="lazy"
+      ></iframe>
+  </div> -->
+  
+  <div id='calendar'></div>
+
+  <div class="events">
+      <h1>{{title}}</h1>
+      {{#each events}}
+        <div class="eventinfo">
+            <strong>{{this.title}}</strong>
+            {{this.description}}<br>
+            {{this.date}}<br>
+            {{this.time}}<br>
+            <span class="badge bg-{{this.importance}}">
+              {{this.importance}}
+            </span><br><br>
+
+            <form action="/events/{{this._id}}?_method=DELETE" method="POST">
+                <button type="submit" aria-label="Delete event {{this.title}}">Delete</button>
+            </form>
+        </div>
+      {{/each}}
+  </div>
+
+<!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Create an Event</h4>
+        </div>
+        <div class="modal-body">
+          <form action="/events" method="POST">
+            <input name="title" type="text" placeholder="Title" required>
+
+            <!-- Combined date and time -->
+            <input name="start" type="datetime-local" required>
+
+            <textarea name="description" placeholder="Description"></textarea>
+
+            <!-- Importance color selection -->
+            <label>Importance:</label>
+            <select name="importance" required>
+              <option value="green">Low</option>
+              <option value="yellow">Medium</option>
+              <option value="red">High</option>
+            </select>
+
+            <button type="submit">Add</button>
+        </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+</main>
