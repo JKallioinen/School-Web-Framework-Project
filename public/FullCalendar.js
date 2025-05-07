@@ -1,11 +1,3 @@
-/* document.addEventListener('DOMContentLoaded', function() {
-    const calendarEl = document.getElementById('calendar')
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth'
-    })
-    calendar.render()
-  })*/
-
 
 $(document).ready(function() {
     $('#calendar').fullCalendar({
@@ -30,7 +22,8 @@ $(document).ready(function() {
             today: 'Today'
         },
         firstDay: 1,
-        events: '/api/events'
-
+        events: '/api/events',
+        timeFormat: 'HH:mm',
+        
     });
 });

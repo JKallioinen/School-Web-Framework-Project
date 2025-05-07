@@ -53,22 +53,26 @@ const calendars = require('./models/Calendar');
 app.get('/api/events', async (req, res) => {
     try {
         const events = await calendars.find().lean();
-
+        
         const formattedEvents = events.map(event => {
-            const dateObj = new Date(event.start);
+            const start = new Date(event.start);
+            const end = event.end ? new Date(event.end) : null;
+
+            // ✅ Manually add 3 hours for Helsinki time
+            start.setHours(start.getHours() + 3);
+            if (end) end.setHours(end.getHours() + 3);
+
             return {
-              ...event,
-              date: dateObj.toLocaleDateString('fi-FI'),
-              time: dateObj.toLocaleTimeString('fi-FI', {
-                hour: '2-digit',
-                minute: '2-digit',
-              }),
-              color: event.importance,
-              textColor: 'black'
+                title: event.title,
+                start: start.toISOString(), // formatted ISO string
+                end: end ? end.toISOString() : undefined,
+                color: event.importance,
+                textColor: 'black'
             };
-          });
+        });
 
         res.status(200).json(formattedEvents);
+        
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -87,24 +91,32 @@ app.get('/events', async (req,res) => {
                 return dateA - dateB; // Sort by earliest date first
             }
         
-            // Custom priority order: red (high), yellow (medium), green (low)
+            // Custom priority order: lightcoral (high), yellow (medium), lightgreen (low)
             const importanceOrder = { lightcoral: 1, yellow: 2, lightgreen: 3 };
             return importanceOrder[a.importance] - importanceOrder[b.importance];
         });
 
         const formattedEvents = events.map(event => {
-            const dateObj = new Date(event.start);
+            const startDate = new Date(event.start);
+            const endDate = event.end ? new Date(event.end) : null;
+          
+            const startTime = startDate.toLocaleTimeString('fi-FI', {
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          
+            const endTime = endDate ? endDate.toLocaleTimeString('fi-FI', {
+              hour: '2-digit',
+              minute: '2-digit'
+            }) : null;
+          
             return {
               ...event,
-              date: dateObj.toLocaleDateString('fi-FI'),
-              time: dateObj.toLocaleTimeString('fi-FI', {
-                hour: '2-digit',
-                minute: '2-digit',
-              }),
+              date: startDate.toLocaleDateString('fi-FI'),
+              time: endTime ? `${startTime} – ${endTime}` : startTime,
               importance: event.importance
             };
           });
-
         res.render('events', 
             {
                 title: 'Our Events',
@@ -123,21 +135,27 @@ app.get('/events', async (req,res) => {
 
 
 // CREATE event
-
 app.post('/events', async (req, res) => {
-    const newEvent = new calendars(req.body);
+
+    try {
+        const newEvent = new calendars({
+            ...req.body,
+            start: new Date(req.body.start),
+            end: req.body.end ? new Date(req.body.end) : null
+        });
     
+        await newEvent.save();
 
-    const eventDate = newEvent.start.toLocaleDateString('fi-FI'); // or 'fi-FI' for Finnish
-    const eventTime = newEvent.start.toLocaleTimeString('fi-FI', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+        if (newEvent.end) {
+            responseMessage = `Event added! ${newEvent.title} on ${newEvent.start} until ${newEvent.end}`;
+        } else {
+            responseMessage = `Event added! ${newEvent.title} on ${newEvent.start} with no end time`;
+        }
+        res.send(responseMessage);
 
-
-    await newEvent.save();
-    res.send(`Event added! ${newEvent.title} on ${eventDate} at ${eventTime}`);
-    
+    } catch (error) {
+        res.status(500).send(`Error adding event: ${error.message}`);
+    }
 });
 
 //DELETE event
