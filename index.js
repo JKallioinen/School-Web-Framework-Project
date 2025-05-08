@@ -29,6 +29,7 @@ app.engine('handlebars', exphbs.engine({
 app.set('view engine', 'handlebars');
 app.set('views', './views');
 
+//For UPDATE and DELETE 
 const methodOverride = require('method-override');
 app.use(methodOverride('_method'));
 
@@ -46,6 +47,17 @@ mongoose.connect(MONGO_URI)
     console.log(err);
 })
 
+
+//For VALIDATION
+const { body, validationResult } = require('express-validator');
+
+const eventValidation = [
+  body('title').notEmpty().withMessage('Title is required'),
+  body('start').isISO8601().notEmpty().withMessage('Invalid start date'),
+  body('end').optional({ checkFalsy: true }).isISO8601().withMessage('Invalid end date'),
+  body('description').optional().trim().escape(),
+  body('importance').isIn(['lightgreen', 'yellow', 'lightcoral']).withMessage('Invalid importance value'),
+];
 
 const calendars = require('./models/Calendar');
 
@@ -135,7 +147,12 @@ app.get('/events', async (req,res) => {
 
 
 // CREATE event
-app.post('/events', async (req, res) => {
+app.post('/events', eventValidation, async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
     try {
         const newEvent = new calendars({
@@ -146,13 +163,16 @@ app.post('/events', async (req, res) => {
     
         await newEvent.save();
 
+        /*
         if (newEvent.end) {
             responseMessage = `Event added! ${newEvent.title} on ${newEvent.start} until ${newEvent.end}`;
         } else {
             responseMessage = `Event added! ${newEvent.title} on ${newEvent.start} with no end time`;
         }
         res.send(responseMessage);
+        */
 
+        res.redirect('/events');
     } catch (error) {
         res.status(500).send(`Error adding event: ${error.message}`);
     }
@@ -176,8 +196,12 @@ app.get('/events/:id/edit', async (req, res) => {
     }
 });
 
-  app.put('/events/:id', async (req, res) => {
-    
+  app.put('/events/:id', eventValidation, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         
         const updatedEvent = await calendars.findByIdAndUpdate(req.params.id, req.body, { new: true });
