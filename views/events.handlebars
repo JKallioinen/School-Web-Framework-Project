@@ -1,36 +1,47 @@
 <main>
-  <!-- <div class="calendar">
-      <h1>Calendar</h1>
-      <iframe 
-        src="https://calendar.google.com/calendar/embed?height=600&wkst=2&ctz=Europe%2FHelsinki&showPrint=0&src=MzgxZDExYzA2ZDhlNzQ0Y2YwZjY1OWVlYWYyZWIzN2FjMDA2NWZkNTUyZjg1MjQwNDVkZjNhZjIwOGI0MTQ1OEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23AD1457"
-        title="Google Calendar Embed"
-        loading="lazy"
-      ></iframe>
-  </div> -->
-  
+
   <div id='calendar'></div>
 
   <div class="events">
       <h1>{{title}}</h1>
       {{#each events}}
         <div class="eventinfo">
-            <p class="eventTitle"><strong>{{this.title}}</strong></p>
-            {{this.description}}<br>
-            {{this.date}}<br>
-            {{this.time}}<br>
+            <h3 class="eventTitle"><strong>{{this.title}}</strong></h3>
+            <p>{{this.description}}</p>
+            <p>{{this.date}}</p>
+            <p>{{this.time}}</p>
             <p class="eventImportance"><strong>Improtance:</strong></p>
             <span class="badge" style="color: black; background-color: {{this.importance}};">
               {{importanceLabel this.importance}}
             </span><br><br>
 
+          <div class="eventButtons">
             <form action="/events/{{this._id}}?_method=DELETE" method="POST">
-                <button type="submit" aria-label="Delete event {{this.title}}">Delete</button>
+                <button type="submit" class="btn btn-danger" aria-label="Delete event {{this.title}}">Delete</button>
             </form>
+                       
+            <button 
+                type="button" 
+                class="open-edit-modal btn btn-default" 
+                data-toggle="modal" 
+                data-target="#editModal"
+                data-id="{{this._id}}"
+                data-title="{{this.title}}"
+                data-start="{{this.start}}"
+                data-end="{{this.end}}"
+                data-description="{{this.description}}"
+                data-importance="{{this.importance}}"
+            >
+                Edit
+            </button>
+          </div>
+
+
         </div>
       {{/each}}
   </div>
 
-<!-- Modal -->
+<!-- Create Event Modal -->
   <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
     
@@ -40,9 +51,10 @@
           <button type="button" class="close" data-dismiss="modal">&times;</button>
           <h4 class="modal-title">Create an Event</h4>
         </div>
+
         <div class="modal-body">
           <form action="/events" method="POST">
-          <label>Event Title</label>
+            <label>Event Title</label>
             <input name="title" type="text" placeholder="Title" required>
             
             <!-- Date and Time -->
@@ -57,15 +69,16 @@
             
             <!-- Importance color selection -->
             <label>Importance:</label>
-            <select name="importance" required>
+            <select name="importance">
               <option value="lightgreen">Low</option>
               <option value="yellow">Medium</option>
               <option value="lightcoral">High</option>
             </select>
             
-            <button type="submit">Add</button>
-        </form>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </form>
         </div>
+
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
@@ -73,5 +86,55 @@
       
     </div>
   </div>
+
+
+<!-- Edit an Event Modal -->
+<div class="modal fade" id="editModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Edit an Event</h4>
+        </div>
+
+        <div class="modal-body">
+          <form id="editEventForm" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            
+            <label>Event Title</label>
+            <input name="title" id="edit-title" type="text" placeholder="Title" required>
+            
+            <!-- Date and Time -->
+            <label>Start Date</label>
+            <input name="start" id="edit-start" type="datetime-local" required>
+
+            <label>End Date</label>
+            <input name="end" id="edit-end" type="datetime-local">
+            
+            <label>More Details</label>
+            <textarea name="description" id="edit-description" placeholder="Description"></textarea>
+            
+            <!-- Importance color selection -->
+            <label>Importance:</label>
+            <select name="importance" id="edit-importance">
+              <option value="lightgreen">Low</option>
+              <option value="yellow">Medium</option>
+              <option value="lightcoral">High</option>
+            </select>
+            
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
   
 </main>

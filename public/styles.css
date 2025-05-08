@@ -67,13 +67,11 @@ main {
 }
 
 button {
-    background-color: #d9534f;
-    color: white;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
 }
 
 button:hover {
@@ -83,6 +81,13 @@ button:hover {
 button:focus {
     outline: 3px solid #005fcc;
     outline-offset: 2px;
+}
+.eventButtons {
+    display: inline-flex;
+    justify-content:space-around;
+}
+.eventButtons button {
+    margin: 5px 5px 5px 0;
 }
 
 /* Responsive tweaks */

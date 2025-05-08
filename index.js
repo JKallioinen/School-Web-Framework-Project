@@ -158,6 +158,41 @@ app.post('/events', async (req, res) => {
     }
 });
 
+//UPDATE event
+app.get('/events/:id/edit', async (req, res) => {
+    try {
+        const event = await calendars.findById(req.params.id);
+        if (!event) {
+            return res.status(404).send('Event not found');
+        }
+
+        // Render the edit form with the event's details
+        res.render('editEvent', { 
+            title: 'Edit Event', 
+            event: event 
+        });
+    } catch (error) {
+        res.status(500).send("Error retrieving event details");
+    }
+});
+
+  app.put('/events/:id', async (req, res) => {
+    
+    try {
+        
+        const updatedEvent = await calendars.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        if (!updatedEvent) {
+            return res.status(404).send("Event not found");
+        }
+
+        res.redirect('/events');
+    } catch (error) {
+        console.error("Error during PUT request:", error);
+        res.status(500).send("Error updating event");
+    }
+});
+
 //DELETE event
 app.delete('/events/:id', async (req, res) => {
     try {
