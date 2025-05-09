@@ -1,6 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('editModal');
     const form = document.getElementById('editEventForm');
   
     document.querySelectorAll('.open-edit-modal').forEach(button => {

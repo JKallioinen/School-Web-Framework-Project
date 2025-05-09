@@ -66,17 +66,29 @@ app.get('/api/events', async (req, res) => {
     try {
         const events = await calendars.find().lean();
         
-        const formattedEvents = events.map(event => {
+        const sortedEvents = events.sort((a, b) => {
+            const dateA = new Date(a.start);
+            const dateB = new Date(b.start);
+        
+            if (dateA.getTime() !== dateB.getTime()) {
+                return dateA - dateB;
+            }
+        
+            // Custom priority order: lightcoral (high), yellow (medium), lightgreen (low)
+            const importanceOrder = { lightcoral: 1, yellow: 2, lightgreen: 3 };
+            return importanceOrder[a.importance] - importanceOrder[b.importance];
+        });
+
+        const formattedEvents = sortedEvents.map(event => {
             const start = new Date(event.start);
             const end = event.end ? new Date(event.end) : null;
-
-            // ✅ Manually add 3 hours for Helsinki time
+            
             start.setHours(start.getHours() + 3);
             if (end) end.setHours(end.getHours() + 3);
 
             return {
                 title: event.title,
-                start: start.toISOString(), // formatted ISO string
+                start: start.toISOString(),
                 end: end ? end.toISOString() : undefined,
                 color: event.importance,
                 textColor: 'black'
@@ -100,7 +112,7 @@ app.get('/events', async (req,res) => {
             const dateB = new Date(b.start);
         
             if (dateA.getTime() !== dateB.getTime()) {
-                return dateA - dateB; // Sort by earliest date first
+                return dateA - dateB;
             }
         
             // Custom priority order: lightcoral (high), yellow (medium), lightgreen (low)
@@ -108,7 +120,7 @@ app.get('/events', async (req,res) => {
             return importanceOrder[a.importance] - importanceOrder[b.importance];
         });
 
-        const formattedEvents = events.map(event => {
+        const formattedEvents = sortedEvents.map(event => {
             const startDate = new Date(event.start);
             const endDate = event.end ? new Date(event.end) : null;
           
@@ -186,7 +198,7 @@ app.get('/events/:id/edit', async (req, res) => {
             return res.status(404).send('Event not found');
         }
 
-        // Render the edit form with the event's details
+        
         res.render('editEvent', { 
             title: 'Edit Event', 
             event: event 
